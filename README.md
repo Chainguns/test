@@ -1,5 +1,1 @@
-gasdas
 asd
-
-asdד
-דד
