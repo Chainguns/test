@@ -1,13 +1,4 @@
 gasdas
 asd
-asd
-fgfgfg
-turytuyt
-asd
-asdasd
-asdsad
-asdasdhjkhkghkg
-ghjhjg
-mhmgh
-asdasd
+
 asd
