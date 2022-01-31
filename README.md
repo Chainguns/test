@@ -1,11 +1,1 @@
-asd
-ed
-s
-s
-ss
-s
-s
-s
-s
-d
-s
+sd
