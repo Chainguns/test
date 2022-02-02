@@ -1,0 +1,136 @@
+
+on: 
+  push
+
+name: Click here to see job results 
+
+jobs:          
+  build_linux:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+         target:
+         - x86_64-unknown-linux-gnu	
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+      - uses: jannekem/run-python-script-action@v1
+        with:
+          script: |
+            f = open('Cargo.toml', 'w')
+            f.writelines('[workspace]\n')
+            f.writelines('members = [\n')
+            f.writelines('	"mapper",\n')
+            f.writelines('	"decider",\n')
+            f.writelines('	"attacker",\n')
+            f.writelines(']\n')
+            f.writelines('[profile.release]\n')
+            f.writelines('opt-level = 3')
+            f.close()
+      - name: musl-tools for ring
+        run: |
+          sudo apt install musl-tools
+          sudo apt-get install build-essential
+          
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{matrix.target}}
+          override: true
+          
+      - uses: Swatinem/rust-cache@v1
+        with:
+          cache-on-failure: true
+
+      - uses: actions-rs/cargo@v1
+        with:
+           use-cross: false
+           command: build
+           args: --release --target=${{matrix.target}}
+#       - name: Slack Notification on Failure
+#         if: ${{ failure() }}
+#         uses: rtCamp/action-slack-notify@v2.2.0
+#         env:
+#           SLACK_CHANNEL: git
+#           SLACK_WEBHOOK: ${{ secrets.ACTION_MONITORING_SLACK }}
+#           SLACK_COLOR: '#FF0000'
+#           SLACK_ICON: ':robot:'
+#           SLACK_TITLE: 'Job failed :x:'
+#           SLACK_LINK_NAMES: true
+#           SLACK_MESSAGE: 'Pull request submitted :rocket:'
+          
+#       - name: Slack Notification on Success
+#         if: ${{ success() }}
+#         uses: rtCamp/action-slack-notify@v2
+#         env:
+#           SLACK_CHANNEL: git
+#           SLACK_WEBHOOK: ${{ secrets.ACTION_MONITORING_SLACK }}
+#           SLACK_COLOR: '#008000'
+#           SLACK_ICON: ':robot:'
+#           SLACK_TITLE: 'Job finished successfully :v:'
+#           SLACK_LINK_NAMES: true
+#           SLACK_MESSAGE: 'Pull request submitted :rocket:' 
+  build_mac:
+    runs-on: macos-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+         target:
+         - x86_64-apple-darwin
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+      - uses: jannekem/run-python-script-action@v1
+        with:
+          script: |
+            f = open('Cargo.toml', 'w')
+            f.writelines('[workspace]\n')
+            f.writelines('members = [\n')
+            f.writelines('	"mapper",\n')
+            f.writelines('	"decider",\n')
+            f.writelines('	"attacker",\n')
+            f.writelines(']\n')
+            f.writelines('[profile.release]\n')
+            f.writelines('opt-level = 3')
+            f.close()
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{matrix.target}}
+          override: true
+  
+      - uses: Swatinem/rust-cache@v1
+        with:
+          cache-on-failure: true
+
+      - uses: actions-rs/cargo@v1
+        with:
+           use-cross: false
+           command: build
+           args: --release --target=${{matrix.target}}
+#       - name: Slack Notification on Failure
+#         if: ${{ failure() }}
+#         uses: rtCamp/action-slack-notify@v2.2.0
+#         env:
+#           SLACK_CHANNEL: git
+#           SLACK_WEBHOOK: ${{ secrets.ACTION_MONITORING_SLACK }}
+#           SLACK_COLOR: '#FF0000'
+#           SLACK_ICON: ':robot:'
+#           SLACK_TITLE: 'Job failed :x:'
+#           SLACK_LINK_NAMES: true
+#           SLACK_MESSAGE: 'Pull request submitted :rocket:'
+          
+#       - name: Slack Notification on Success
+#         if: ${{ success() }}
+#         uses: rtCamp/action-slack-notify@v2
+#         env:
+#           SLACK_CHANNEL: git
+#           SLACK_WEBHOOK: ${{ secrets.ACTION_MONITORING_SLACK }}
+#           SLACK_COLOR: '#008000'
+#           SLACK_ICON: ':robot:'
+#           SLACK_TITLE: 'Job finished successfully :v:'
+#           SLACK_LINK_NAMES: true
+#           SLACK_MESSAGE: 'Pull request submitted :rocket:'
